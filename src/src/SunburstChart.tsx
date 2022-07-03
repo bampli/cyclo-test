@@ -20,7 +20,9 @@ export const SunburstChart = () => {
     d3.partition<Data>().size([2 * Math.PI, RADIUS])(
       d3
         .hierarchy(data)
+        //@ts-ignore
         .sum((d) => d.value)
+        //@ts-ignore
         .sort((a, b) => b.value - a.value)
     );
 
@@ -54,6 +56,7 @@ export const SunburstChart = () => {
   }, []);
 
   const getColor = (d: d3.HierarchyRectangularNode<Data>) => {
+    //@ts-ignore
     while (d.depth > 1) d = d.parent;
     return color(d.data.name);
   };
@@ -73,6 +76,7 @@ export const SunburstChart = () => {
           .descendants()
           .filter((d) => d.depth)
           .map((d, i) => (
+            //@ts-ignore
             <path key={`${d.data.name}-${i}`} fill={getColor(d)} d={arc(d)}>
               <text>
                 {d
@@ -80,7 +84,10 @@ export const SunburstChart = () => {
                   .map((d) => d.data.name)
                   .reverse()
                   .join("/")}
-                \n${format(d.value)}
+                \n${format(
+                  //@ts-ignore
+                  d.value
+                )}
               </text>
             </path>
           ))}
