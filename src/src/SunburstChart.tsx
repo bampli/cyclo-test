@@ -45,7 +45,6 @@ export const SunburstChart = () => {
     if (!svgRef.current) {
       return "";
     }
-
     const { x, y, width, height } = svgRef.current.getBBox();
 
     return [x, y, width, height].toString();

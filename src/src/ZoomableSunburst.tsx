@@ -23,6 +23,7 @@ export const ZoomableSunburst = () => {
       .sum(d => d.value)
       //@ts-ignore
       .sort((a, b) => b.value - a.value);
+
     return d3.partition()
       .size([2 * Math.PI, root.height + 1])
       (root);
@@ -32,7 +33,6 @@ export const ZoomableSunburst = () => {
     if (!svgRef.current) {
       return "";
     }
-
     const { x, y, width, height } = svgRef.current.getBBox();
 
     return [x, y, width, height].toString();
@@ -46,19 +46,14 @@ export const ZoomableSunburst = () => {
 
   const format = d3.format(",d");
 
-  const arc = d3.arc()
-    //@ts-ignore
+  const arc = d3
+    .arc<d3.HierarchyRectangularNode<Data>>()
     .startAngle(d => d.x0)
-    //@ts-ignore
     .endAngle(d => d.x1)
-    //@ts-ignore
     .padAngle(d => Math.min((d.x1 - d.x0) / 2, 0.005))
-    //@ts-ignore
-    .padRadius(radius * 1.5)
-    //@ts-ignore
-    .innerRadius(d => d.y0 * radius)
-    //@ts-ignore
-    .outerRadius(d => Math.max(d.y0 * radius, d.y1 * radius - 1))
+    .padRadius(RADIUS * 1.5)
+    .innerRadius(d => d.y0 * RADIUS)
+    .outerRadius(d => Math.max(d.y0 * RADIUS, d.y1 * RADIUS - 1))
 
   const root = partition(data);
   //@ts-ignore
@@ -112,45 +107,45 @@ export const ZoomableSunburst = () => {
 
   const parent = g.append("circle")
     .datum(root)
-    //@ts-ignore
-    .attr("r", radius)
+    .attr("r", RADIUS)
     .attr("fill", "none")
     .attr("pointer-events", "all");
-    //.on("click", clicked);
+  //   .on("click", clicked);
 
   // function clicked(event, p) {
+
   //   parent.datum(p.parent || root);
 
-  //   root.each(d => d.target = {
-  //     x0: Math.max(0, Math.min(1, (d.x0 - p.x0) / (p.x1 - p.x0))) * 2 * Math.PI,
-  //     x1: Math.max(0, Math.min(1, (d.x1 - p.x0) / (p.x1 - p.x0))) * 2 * Math.PI,
-  //     y0: Math.max(0, d.y0 - p.depth),
-  //     y1: Math.max(0, d.y1 - p.depth)
-  //   });
+  //   // root.each(d => d.target = {
+  //   //   x0: Math.max(0, Math.min(1, (d.x0 - p.x0) / (p.x1 - p.x0))) * 2 * Math.PI,
+  //   //   x1: Math.max(0, Math.min(1, (d.x1 - p.x0) / (p.x1 - p.x0))) * 2 * Math.PI,
+  //   //   y0: Math.max(0, d.y0 - p.depth),
+  //   //   y1: Math.max(0, d.y1 - p.depth)
+  //   // });
 
   //   const t = g.transition().duration(750);
 
   //   // Transition the data on all arcs, even the ones that aren’t visible,
   //   // so that if this transition is interrupted, entering arcs will start
   //   // the next transition from the desired position.
-  //   path.transition(t)
-  //       .tween("data", d => {
-  //         const i = d3.interpolate(d.current, d.target);
-  //         return t => d.current = i(t);
-  //       })
-  //     .filter(function(d: d3.HierarchyRectangularNode<Data>) {
-  //       return +this.getAttribute("fill-opacity") || arcVisible(d.target);
-  //     })
-  //       .attr("fill-opacity", d => arcVisible(d.target) ? (d.children ? 0.6 : 0.4) : 0)
-  //       .attr("pointer-events", d => arcVisible(d.target) ? "auto" : "none") 
+  //   // path.transition(t)
+  //   //     .tween("data", d => {
+  //   //       const i = d3.interpolate(d.current, d.target);
+  //   //       return t => d.current = i(t);
+  //   //     })
+  //   //   .filter(function(d: d3.HierarchyRectangularNode<Data>) {
+  //   //     return +this.getAttribute("fill-opacity") || arcVisible(d.target);
+  //   //   })
+  //   //     .attr("fill-opacity", d => arcVisible(d.target) ? (d.children ? 0.6 : 0.4) : 0)
+  //   //     .attr("pointer-events", d => arcVisible(d.target) ? "auto" : "none") 
 
-  //       .attrTween("d", d => () => arc(d.current));
+  //   //     .attrTween("d", d => () => arc(d.current));
 
-  //   label.filter(function(d: d3.HierarchyRectangularNode<Data>) {
-  //       return +this.getAttribute("fill-opacity") || labelVisible(d.target);
-  //     }).transition(t)
-  //       .attr("fill-opacity", d => +labelVisible(d.target))
-  //       .attrTween("transform", d => () => labelTransform(d.current));
+  //   // label.filter((d) => {
+  //   //     return +this.getAttribute("fill-opacity") || labelVisible(d.target);
+  //   //   }).transition(t)
+  //   //     .attr("fill-opacity", d => +labelVisible(d.target))
+  //   //     .attrTween("transform", d => () => labelTransform(d.current));
   // }
 
   function arcVisible(d: d3.HierarchyRectangularNode<Data>) {
