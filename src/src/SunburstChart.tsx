@@ -1,5 +1,3 @@
-// Check full tutorial: https://dev.to/andrewchmr/react-d3-sunburst-chart-3cpd
-
 import React from "react";
 import * as d3 from "d3";
 import data from "./data.json";
@@ -16,16 +14,18 @@ export const SunburstChart = () => {
   const svgRef = React.useRef<SVGSVGElement>(null);
   const [viewBox, setViewBox] = React.useState("0,0,0,0");
 
-  const partition = (data: Data) =>
-    d3.partition<Data>().size([2 * Math.PI, RADIUS])(
-      d3
-        .hierarchy(data)
-        //@ts-ignore
-        .sum((d) => d.value)
-        //@ts-ignore
-        .sort((a, b) => b.value - a.value)
-    );
+  const partition = (d: Data) =>
+    d3.partition<Data>()
+      .size([2 * Math.PI, RADIUS])
+      (
+        d3.hierarchy<Data>(d)
+          //@ts-ignore
+          .sum((d) => d.value)
+          //@ts-ignore
+          .sort((a, b) => b.value - a.value)
+      );
 
+  // interpolateRdYlGn
   const color = d3.scaleOrdinal(
     d3.quantize(d3.interpolateRainbow, data.children.length + 1)
   );
@@ -46,7 +46,6 @@ export const SunburstChart = () => {
       return "";
     }
     const { x, y, width, height } = svgRef.current.getBBox();
-
     return [x, y, width, height].toString();
   };
 
@@ -54,9 +53,9 @@ export const SunburstChart = () => {
     setViewBox(getAutoBox());
   }, []);
 
-  const getColor = (d: d3.HierarchyRectangularNode<Data>) => {
+  const getColor = (d: d3.HierarchyNode<Data> | null) => {
+    while (d && d.depth > 1) d = d.parent;
     //@ts-ignore
-    while (d.depth > 1) d = d.parent;
     return color(d.data.name);
   };
 
@@ -113,3 +112,5 @@ export const SunburstChart = () => {
     </svg>
   );
 };
+
+// Check full tutorial: https://dev.to/andrewchmr/react-d3-sunburst-chart-3cpd
